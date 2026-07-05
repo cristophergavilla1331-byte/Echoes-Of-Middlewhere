@@ -1,0 +1,85 @@
+name: Build Echoes of Middlewhere
+
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:
+
+jobs:
+  build-windows:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install build deps
+        run: |
+          pip install pyinstaller
+          pip install windows-curses
+      - name: Build exe
+        run: pyinstaller --onefile --name EchoesOfMiddlewhere EOMwin.py
+      - name: Package
+        run: |
+          mkdir release
+          copy dist\EchoesOfMiddlewhere.exe release\
+        shell: cmd
+      - uses: actions/upload-artifact@v4
+        with:
+          name: EchoesOfMiddlewhere-Windows
+          path: release/
+
+  build-macos:
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install build deps
+        run: pip install pyinstaller
+      - name: Build binary
+        run: pyinstaller --onefile --name EchoesOfMiddlewhere EOMwin.py
+      - name: Package with double-clickable launcher
+        run: |
+          mkdir release
+          cp dist/EchoesOfMiddlewhere release/
+          chmod +x release/EchoesOfMiddlewhere
+          cat > "release/Play EchoesOfMiddlewhere.command" << 'EOF'
+          #!/bin/bash
+          cd "$(dirname "$0")"
+          ./EchoesOfMiddlewhere
+          EOF
+          chmod +x "release/Play EchoesOfMiddlewhere.command"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: EchoesOfMiddlewhere-Mac
+          path: release/
+
+  build-linux:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install build deps
+        run: pip install pyinstaller
+      - name: Build binary
+        run: pyinstaller --onefile --name EchoesOfMiddlewhere EOMwin.py
+      - name: Package with launcher script
+        run: |
+          mkdir release
+          cp dist/EchoesOfMiddlewhere release/
+          chmod +x release/EchoesOfMiddlewhere
+          cat > release/run.sh << 'EOF'
+          #!/bin/bash
+          cd "$(dirname "$0")"
+          ./EchoesOfMiddlewhere
+          EOF
+          chmod +x release/run.sh
+      - uses: actions/upload-artifact@v4
+        with:
+          name: EchoesOfMiddlewhere-Linux
+          path: release/
