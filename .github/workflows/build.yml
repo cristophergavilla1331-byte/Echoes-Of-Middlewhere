@@ -11,15 +11,9 @@ jobs:
     runs-on: windows-latest
     steps:
       - uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
-      - name: Locate and Force Script
-        run: |
-          dir /s EOMwin.py
-          powershell -Command "Copy-Item (Get-ChildItem -Recurse -Filter EOMwin.py).FullName -Destination ."
       - name: Install build deps
         run: |
           pip install pyinstaller windows-curses
@@ -39,15 +33,9 @@ jobs:
     runs-on: macos-latest
     steps:
       - uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
-      - name: Locate and Force Script
-        run: |
-          find . -name "EOMwin.py"
-          cp $(find . -name "EOMwin.py" | head -n 1) .
       - name: Install build deps
         run: pip install pyinstaller
       - name: Build binary
@@ -72,15 +60,9 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
-      - name: Locate and Force Script
-        run: |
-          find . -name "EOMwin.py"
-          cp $(find . -name "EOMwin.py" | head -n 1) .
       - name: Install build deps
         run: pip install pyinstaller
       - name: Build binary
